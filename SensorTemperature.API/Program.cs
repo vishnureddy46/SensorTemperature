@@ -2,10 +2,19 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using SensorTemperature.API;
 using SensorTemperature.API.DbContexts;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+  .MinimumLevel.Debug()
+  .WriteTo.Console()
+  .WriteTo.File("logs/roomtemperature.txt", rollingInterval: RollingInterval.Day)
+  .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Host.UseSerilog();
 // Add services to the container.
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -14,7 +23,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 builder.Services.AddSingleton<RoomSensorDataStore>();
 builder.Services.AddDbContext<RoomTemperatureInfoContext>(
-    DbContextOptions=> DbContextOptions.UseSqlite("Data Source=RoomTemperatureInfo.db"));
+    DbContextOptions=> DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:RoomTemperatureDbConnectionString"]));
 
 var app = builder.Build();
 
