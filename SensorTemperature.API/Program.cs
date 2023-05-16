@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using SensorTemperature.API;
 using SensorTemperature.API.DbContexts;
+using SensorTemperature.API.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -24,7 +25,7 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 builder.Services.AddSingleton<RoomSensorDataStore>();
 builder.Services.AddDbContext<RoomTemperatureInfoContext>(
     DbContextOptions=> DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:RoomTemperatureDbConnectionString"]));
-
+builder.Services.AddTransient<LocalMailService> ();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
